@@ -1,0 +1,248 @@
+{% extends 'main/main.html' %}
+{% block content %}
+<script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<div style="background-color: #221F1F;" >
+	<h1 style="text-align: center; color: rgb(255, 255, 255);">Let's see how You did!</h1>
+	<br>
+	<h3 style="text-align: center; color: rgb(255, 255, 255);">First see what you usually pick versus what other people do.</h3>
+
+	<div class="row">
+		<div class="col-lg-6"><div id="myChart0"></div></div>
+		<div class="col-lg-6"><div id="myChart1"></div></div>
+	</div>
+	<div id="myChart2" style="width: 100%; align-items:center;"></div>
+
+	<h3 style="text-align: center; color: rgb(255, 255, 255)">So how did you do? Better or worse than you thought?</h3>
+	<h4 style="text-align: center; color: rgb(255, 255, 255)">Have any thoughts on how to make this app better? Please feel free to write me anytime.</h4>
+	
+	<footer class="page-footer">
+		<!--Section heading-->
+    <h2 class="h1-responsive font-weight-bold text-center my-4">Contact me</h2>
+    <!--Section description-->
+
+    <div class="row">
+
+        <!--Grid column-->
+        <div class="col-md-1"></div>
+        <div class="col-md-8 mb-md-0 mb-5">
+            <form id="contact-form" name="contact-form" method="POST" action="{% url 'stats' player.id %}">
+            {% csrf_token %}
+                <!--Grid row-->
+                <div class="row">
+
+                    <!--Grid column-->
+                    <div class="col-md-6">
+                        <div class="md-form mb-0">
+                            {{form.Your_name}}
+                            <label for="name" class="">Your name</label>
+                        </div>
+                    </div>
+                    <!--Grid column-->
+
+                    <!--Grid column-->
+                    <div class="col-md-6">
+                        <div class="md-form mb-0">
+                            {{form.Your_email}}
+                            <label for="email" class="">Your email</label>
+                        </div>
+                    </div>
+                    <!--Grid column-->
+
+                </div>
+                <!--Grid row-->
+
+                <!--Grid row-->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="md-form mb-0">
+                            {{form.subject}}
+                            <label for="subject" class="">Subject</label>
+                        </div>
+                    </div>
+                </div>
+                <!--Grid row-->
+
+                <!--Grid row-->
+                <div class="row">
+
+                    <!--Grid column-->
+                    <div class="col-md-12">
+
+                        <div class="md-form">
+                            {{form.message}}
+                            <label for="message">Your message</label>
+                        </div>
+
+                    </div>
+                    
+                </div>
+                <!--Grid row-->
+
+           
+
+            <div class="text-center text-md-left">
+                <input class="btn btn-warning" type="submit" name="Send">
+            </div>
+
+
+            <div class="status"></div>
+            </form>
+        </div>
+        <!--Grid column-->
+
+        <!--Grid column-->
+        <div class="col-md-3 text-center">
+            <ul class="list-unstyled mb-0">
+
+                <li><i class="fas fa-phone mt-4 fa-2x"></i>
+                    <p>+39 389 287 2311 <br>
+                    (please use WhatsApp)</p>
+                </li>
+
+                <li><i class="fas fa-envelope mt-4 fa-2x"></i>
+                    <p>menhior1@gmail.com</p>
+                </li>
+              </ul>
+          </div>
+        <!--Grid column-->
+
+      </div>
+	</footer>
+</div>
+
+<script>
+
+	var state = {
+		'items':[],
+		'values':[],
+	}
+
+	var playerId = '{{player.id}}'
+
+	var dataURL = `/statsdata/${playerId}/`
+
+	$.ajax({
+		method:'GET',
+		url:dataURL,
+		success:function(response){
+			console.log('RESPONSE:', response)
+
+			for (var i in response){
+
+				var key = Object.keys(response[i])
+				var value = Object.values(response[i])
+
+				state.items.push(key)
+				state.values.push(value)
+			}
+			/*var key = Object.keys(response[0])
+			var value = Object.values(response[0])
+			var key1 = Object.keys(response[1])
+			var value1 = Object.values(response[1])
+			var key2 = Object.keys(response[2])
+			var value2 = Object.values(response[2])
+
+			state.items.push(key)
+			state.values.push(value)
+			state.items.push(key1)
+			state.values.push(value1)
+			state.items.push(key2)
+			state.values.push(value2)*/
+
+			console.log('STATE:', state.values)
+			console.log('Winrate:',state.values[2][0])
+			buildBarChart(0)
+			buildBarChart(1)
+			buildPieChart(2)
+
+		}
+	})
+
+	function buildBarChart(i){
+
+
+		zingchart.render({
+		  id: 'myChart' + i,
+		  data: {
+		  	theme: 'dark',
+      		type: 'bar',
+      		'scale-x': {
+      			values: state.items[i]
+      		},
+      		series: [
+        		{ values: state.values[i] },
+     			 ]
+    		}
+  		});
+	}
+
+
+	function buildPieChart(i){
+
+		console.log('Winrate', state.values[i][0])
+		zingchart.render({
+		  id: 'myChart' + i,
+		  data: {
+		  	theme: 'dark',
+      		type: 'pie',
+      		title: {
+      			text: 'Now check Win/Loss/Tie statistics',
+      			'font-size':30,
+      			'font-family': 'sans-serif',
+      		},
+      		subtitle: {
+			    text: "Left is you, right is how other players do.",
+			    'font-weight': "normal",
+			    'font-size':20,
+			  },
+      		scale: {
+    			layout: "1x2", //specify the layout by rows and columns
+    			'size-factor': 0.8 //provide a decimal or percentage value
+ 				 },
+      		legend: {
+      				layout: '1x3',
+      				x: "42%",
+      				y: "80%",
+			    },
+      		series: [
+      			{values: [state.values[i][0],state.values[i+1][0],], text: 'Wins'},
+      			{values: [state.values[i][1],state.values[i+1][1],], text: 'Losses'},
+      			{values: [state.values[i][2],state.values[i+1][2],], text: 'Ties'},
+      				/*{ values: [state.values[i][0]], text: state.items[i][0]},
+      				{ values: [state.values[i][1]], text: state.items[i][1]},
+      				{ values: [state.values[i][2]], text: state.items[i][2]},*/
+     			 ]
+        		}
+  		});
+	}
+
+
+	/*var chartData = {
+		'type'  = 'bar',
+		'scale-x' : {
+			'values': [
+			'Dennis',
+			'Erik',
+			'Tim'
+			]
+		},
+		'series': [
+			{
+				'values':[
+					25,
+					23,
+					27
+				]
+			}
+		]
+
+	}
+
+	zingchart.render({
+		id: 'myChart',
+		data: chartData,
+	})*/
+</script>
+{% endblock %}

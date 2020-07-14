@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="le=edge">
+	<title>Rock paper and scissors</title>
+	<link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+	<!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.0/css/mdb.min.css" rel="stylesheet">
+	<script>
+		function getCookie(name) {
+		    // Split cookie string and get all individual name=value pairs in an array
+		    var cookieArr = document.cookie.split(";");
+
+		    // Loop through the array elements
+		    for(var i = 0; i < cookieArr.length; i++) {
+		        var cookiePair = cookieArr[i].split("=");
+
+		        /* Removing whitespace at the beginning of the cookie name
+		        and compare it with the given string */
+		        if(name == cookiePair[0].trim()) {
+		            // Decode the cookie value and return
+		            return decodeURIComponent(cookiePair[1]);
+		        }
+		    }
+
+		    // Return null if not found
+		    return null;
+		}
+
+		function getToken(name) {
+		    var cookieValue = null;
+		    if (document.cookie && document.cookie !== '') {
+		        var cookies = document.cookie.split(';');
+		        for (var i = 0; i < cookies.length; i++) {
+		            var cookie = cookies[i].trim();
+		            // Does this cookie string begin with the name we want?
+		            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+		                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+		                break;
+		            }
+		        }
+		    }
+		    return cookieValue;
+		}
+		
+		function uuidv4() {
+		  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+		    return v.toString(16);
+		  });
+		}
+
+		var device = getToken('device')
+
+		if (device == null || device == undefined){
+			device = uuidv4()
+		}
+
+		document.cookie = 'device=' + device + ';domain=;path=/'
+
+		var stats = JSON.parse(getCookie('stats'))
+
+
+		if (stats == undefined){
+			stats = {"playerStats":{"rock":0,"paper":0,"scissors":0},"pScore":0,"cScore":0, 'tie':0}
+			console.log('Stats Created!', stats)
+			document.cookie ='stats=' + JSON.stringify(stats) + ";domain=;path=/"
+		}
+
+		//var csrftoken = getToken('csrftoken')
+		var rockPic = "{% static "images/rock.png" %}"
+		var scissorsPic = "{% static "images/scissors.png" %}"
+		var paperPic = "{% static "images/paper.png" %}"
+
+		var picDictionary = {'rock': rockPic, 'scissors': scissorsPic, 'paper': paperPic}
+	</script>
+	<script>
+		var player = '{{player}}';
+		console.log(player)
+		if (player=='Nobody'){
+			location.reload(true)
+		}
+
+
+
+		function saveData(pScore = stats['pScore'], cScore = stats['cScore'], tie = stats['tie']){
+			location.reload(true)
+			/*console.log(pScore)
+			console.log(cScore)
+			console.log(tie)
+		    var url = '/save_data/'
+
+			fetch(url, {
+				method: 'POST',
+				headers:{
+					'Content-Type': 'application/json',
+					'X-CSRFToken': csrftoken,
+				},
+				body: JSON.stringify({'pScore': pScore, 'cScore': cScore})
+			})
+			.then((response) => {
+				console.log(response)
+				return response.json();
+			})
+			.then((data) => {
+				console.log(data)
+
+			})*/
+		}
+	</script>
+</head>
+	<body onbeforeunload="saveData()">
+		
+			{% block content %}
+			{% endblock %}
+
+
+		<!-- JQuery -->
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<!-- Bootstrap tooltips -->
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+		<!-- Bootstrap core JavaScript -->
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/js/bootstrap.min.js"></script>
+		<!-- MDB core JavaScript -->
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.19.1/js/mdb.min.js"></script>
+	</body>
+</html>
